@@ -2,12 +2,18 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-int cnt;
 
-struct Point
+struct Point  // 사각형의 높이 넓이
 {
 	int r, c;
 };
+
+int sticker(int r , int c, int r_input, int c_input) // 스티커를 붙일 수 있는지 검사 
+{
+	if (r >= r_input && c >= c_input) return 1; // 스티커를 돌리지 않고 붙였으면 1
+	if (r >= c_input && c >= r_input) return 2; // 스티커를 돌려서 붙여야 하면 2
+	else return 0;
+}
 int main()
 {
 	int row, col;
@@ -20,77 +26,31 @@ int main()
 	{
 		cin >> v[i].r >> v[i].c;
 	}
-	int ans_1 = 0, ans_2 = 0;
-	for (int i = 0; i < num; i++)
+	
+	int ans = 0; // 정답
+	for (int i = 0; i < num - 1; i++) // 입력받은 벡터의 크기 - 1 만큼 반복
 	{
-		if (row >= v[i].r)
+		if (sticker(row, col, v[i].r, v[i].c) == 1)
 		{
-			if (col >= v[i].c) {
-				ans_1 = max(ans_1, (v[i].r * v[i].c));
-				for (int j = i + 1; j < num; j++)
-				{
-					if (row - v[i].r >= v[j].r)
-					{
-						if (col >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-					if (col >= v[j].r)
-					{
-						if (row - v[i].r >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-					if (row - v[i].r >= v[j].r)
-					{
-						if (col >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-					if (col >= v[j].r)
-					{
-						if (row - v[i].r >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-				}
-			}
-			else continue;
-		}
-		if (col >= v[i].r)
-		{
-			if (row >= v[i].c) {
-				ans_1 = max(ans_1, (v[i].r * v[i].c));
-				for (int j = i + 1; j < num; j++)
-				{
-					if (row - v[i].c >= v[j].r)
-					{
-						if (col >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-					if (col >= v[j].r)
-					{
-						if (row - v[i].c >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-					if (row - v[i].c >= v[j].r)
-					{
-						if (col >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-					if (col >= v[j].r)
-					{
-						if (row - v[i].c >= v[j].c) {
-							ans_2 = max(ans_2, ans_1 + (v[j].r * v[j].c));
-						}
-					}
-				}
+			int n_r = row - v[i].r;
+			int n_c = col - v[i].c;
+			for (int j = i + 1; j < num; j++) // 두번째 도형은 i+1 부터 num까지 반복
+			{
+				if (sticker(n_r, col, v[j].r, v[j].c)) ans = max(ans, (v[i].r * v[i].c) + (v[j].r) * (v[j].c));
+				if (sticker(row, n_c, v[j].r, v[j].c)) ans = max(ans, (v[i].r * v[i].c) + (v[j].r) * (v[j].c));
 			}
 		}
+		if (sticker(row, col, v[i].r, v[i].c) == 2)
+		{
+			int n_r = row - v[i].c;
+			int n_c = col - v[i].r;
+			for (int j = i + 1; j < num; j++) // 두번째 도형은 i+1 부터 num까지 반복
+			{
+				if (sticker(n_r, col, v[j].r, v[j].c)) ans = max(ans, (v[i].r * v[i].c) + (v[j].r) * (v[j].c));
+				if (sticker(row, n_c, v[j].r, v[j].c)) ans = max(ans, (v[i].r * v[i].c) + (v[j].r) * (v[j].c));
+			}
+		}
+		else continue;
 	}
-
-	cout << ans_2;
+	cout << ans;
 }
